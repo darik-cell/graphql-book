@@ -1,3 +1,5 @@
+pom.xml
+--------------------------------------------------
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -31,12 +33,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.graphql-java</groupId>
-			<artifactId>graphql-java-extended-scalars</artifactId>
-			<version>22.0</version>
 		</dependency>
 
 		<dependency>
@@ -96,3 +92,78 @@
 	</build>
 
 </project>
+
+src\main\java\org\study\graphqldemophoto\GraphqlDemoPhotoApplication.java
+--------------------------------------------------
+package org.study.graphqldemophoto;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class GraphqlDemoPhotoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(GraphqlDemoPhotoApplication.class, args);
+	}
+
+}
+
+src\main\resources\application.properties
+--------------------------------------------------
+spring.application.name=graphql-demo-photo
+
+src\main\resources\graphql\schema.graphql
+--------------------------------------------------
+scalar DateTime
+
+type User {
+    githubLogin: ID!
+    name: String
+    avatar: String
+    postedPhotos: [Photo!]!
+    inPhotos: [Photo!]!
+}
+
+type Photo {
+    id: ID!
+    name: String!
+    url: String!
+    description: String
+    created: DateTime!
+    category: PhotoCategory!
+    postedBy: User!
+    taggedUsers: [User!]!
+}
+
+enum PhotoCategory {
+    SELFIE
+    PORTRAIT
+    ACTION
+    LANDSCAPE
+    GRAPHIC
+}
+
+input PostPhotoInput {
+    name: String!
+    description: String
+    category: PhotoCategory=PORTRAIT
+}
+
+type Mutation {
+    postPhoto(input: PostPhotoInput!): Photo!
+}
+
+type Query {
+    totalPhotos: Int!
+    allPhotos(category: PhotoCategory): [Photo!]!
+    totalUsers: Int!
+    allUsers: [User!]!
+    user(id: ID!): User!
+}
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
